@@ -1,5 +1,9 @@
 package br.com.landisgyr.energyconsumption.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_EMPTY)
 public class Meter {
 	private String meterNo;
 	private Long consumption;

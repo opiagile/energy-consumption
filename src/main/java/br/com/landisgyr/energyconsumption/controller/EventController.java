@@ -15,7 +15,6 @@ import br.com.landisgyr.energyconsumption.exception.BillingCalculationException;
 import br.com.landisgyr.energyconsumption.exception.MeterControllerException;
 import br.com.landisgyr.energyconsumption.model.Meter;
 import br.com.landisgyr.energyconsumption.service.EnergyConsumptionService;
-import br.com.landisgyr.energyconsumption.vo.MeterVO;
 
 @RestController
 @RequestMapping(value = "/event", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -23,6 +22,7 @@ public class EventController {
 
 	@Autowired
 	EnergyConsumptionService energyConsumptionService;
+	private Meter meterResponse;
 
 	public EventController(EnergyConsumptionService energyConsumptionService) {
 		this.energyConsumptionService = energyConsumptionService;
@@ -61,7 +61,7 @@ public class EventController {
 		
 		Meter meter = energyConsumptionService.saveMeter(meterDTO.getMeterNumber());
 
-		return new ResponseEntity<>(new MeterVO(meter), HttpStatus.CREATED);
+		return new ResponseEntity<>(meter, HttpStatus.CREATED);
 	}
 
 	private ResponseEntity<Object> pushMeter(MeterDTO meterDTO, Meter meter) {
@@ -73,7 +73,7 @@ public class EventController {
 		meter.setConsumption(meterDTO.getActiveEnergy());
 		meter.setMicrogeneration(meterDTO.getInjectedEnergy());
 
-		return new ResponseEntity<>(new MeterVO(meter), HttpStatus.CREATED);
+		return new ResponseEntity<>(meter, HttpStatus.CREATED);
 	}
 		
 	@SuppressWarnings("unused")
@@ -84,7 +84,10 @@ public class EventController {
 		}
 
 		Double cash = energyConsumptionService.calculateBilling(meter.getConsumption(), meter.getMicrogeneration(), meterDTO.getUnit());
-		return new ResponseEntity<>(new MeterVO(meter), HttpStatus.CREATED);
+		meterResponse = new Meter();
+		meterResponse.setMeterNo(meter.getMeterNo());
+		meterResponse.setCash(cash);
+		return new ResponseEntity<>(meterResponse, HttpStatus.CREATED);
 	}
 
 }
